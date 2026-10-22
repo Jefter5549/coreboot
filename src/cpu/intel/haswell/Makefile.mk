@@ -36,4 +36,7 @@ cpu_microcode_bins += $(wildcard 3rdparty/intel-microcode/intel-ucode/06-3c-*)
 cpu_microcode_bins += $(wildcard 3rdparty/intel-microcode/intel-ucode/06-46-*)
 # Broadwell Trad
 cpu_microcode_bins += $(wildcard 3rdparty/intel-microcode/intel-ucode/06-47-*)
+# Haswell-EP / Broadwell-EP (Grantley / Server LGA2011-3)
+cpu_microcode_bins += $(wildcard 3rdparty/intel-microcode/intel-ucode/06-3f-*)
+cpu_microcode_bins += $(wildcard 3rdparty/intel-microcode/intel-ucode/06-4f-*)
 endif

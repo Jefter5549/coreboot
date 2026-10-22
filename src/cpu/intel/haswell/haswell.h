@@ -10,9 +10,11 @@
 /* CPU types without stepping */
 #define HASWELL_FAMILY_TRAD	0x306c0
 #define HASWELL_FAMILY_ULT	0x40650
+#define HASWELL_FAMILY_EP	0x306f0
 #define CRYSTALWELL_FAMILY	0x40660
 #define BROADWELL_FAMILY_TRAD	0x40670
 #define BROADWELL_FAMILY_ULT	0x306d0
+#define BROADWELL_FAMILY_EP	0x406f0
 
 /* Haswell CPUIDs */
 #define CPUID_HASWELL_A0	0x306c1
@@ -202,6 +204,7 @@ static inline bool cpu_is_haswell(void)
 	switch (cpu_family_model()) {
 	case HASWELL_FAMILY_TRAD:
 	case HASWELL_FAMILY_ULT:
+	case HASWELL_FAMILY_EP:
 	case CRYSTALWELL_FAMILY:
 		return true;
 	default:
@@ -214,6 +217,7 @@ static inline bool cpu_is_broadwell(void)
 	switch (cpu_family_model()) {
 	case BROADWELL_FAMILY_TRAD:
 	case BROADWELL_FAMILY_ULT:
+	case BROADWELL_FAMILY_EP:
 		return true;
 	default:
 		return false;
