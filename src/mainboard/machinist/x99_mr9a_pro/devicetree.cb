@@ -1,0 +1,81 @@
+chip northbridge/intel/haswell
+
+	chip cpu/intel/haswell
+		device cpu_cluster 0 on ops haswell_cpu_bus_ops end
+	end
+
+	device domain 0 on
+		ops haswell_pci_domain_ops
+
+		device pci 00.0 on end # Host Bridge (Haswell-EP 0x2f00)
+		device pci 01.0 on end # PEG Root Port 1 (0x2f02)
+		device pci 01.1 on end # PEG Root Port 1 (0x2f03)
+		device pci 02.0 on end # PEG Root Port 2 (0x2f04)
+		device pci 03.0 on end # PEG Root Port 3 (0x2f08 - RTX 2060 SUPER)
+
+		chip southbridge/intel/lynxpoint
+			register "gen1_dec" = "0x003c0a01" # HWM at 0x0a20
+			register "gen4_dec" = "0x001c0601" # PM/ACPI window
+
+			device pci 14.0 on end # xHCI
+			device pci 16.0 off end # MEI #1 (Hidden in PCH)
+			device pci 16.1 off end
+			device pci 16.2 off end
+			device pci 16.3 off end
+			device pci 1a.0 on end # EHCI #2
+			device pci 1b.0 on end # HDA (Realtek ALC897)
+			device pci 1c.0 on end # RP #1
+			device pci 1c.1 on end # RP #2: Realtek RTL8111 GbE
+			device pci 1c.2 off end
+			device pci 1c.3 off end
+			device pci 1c.4 off end
+			device pci 1c.5 off end
+			device pci 1c.6 off end
+			device pci 1c.7 off end
+			device pci 1d.0 on end # EHCI #1
+			device pci 1f.0 on # LPC bridge
+
+				chip superio/nuvoton/nct6779d
+					device pnp 2e.1 off end   # Parallel Port
+					device pnp 2e.2 on        # UART A (COM1)
+						io 0x60 = 0x3f8
+						irq 0x70 = 4
+					end
+					device pnp 2e.3 off end   # UART B (COM2)
+					device pnp 2e.5 on        # Keyboard Controller
+						io 0x60 = 0x60
+						io 0x62 = 0x64
+						irq 0x70 = 1
+						irq 0x72 = 12
+					end
+					device pnp 2e.6 off end   # CIR
+					device pnp 2e.7 off end   # GPIO6,7,8
+					device pnp 2e.8 off end   # WDT1, GPIO0,1
+					device pnp 2e.a off end   # ACPI
+					device pnp 2e.b on        # Hardware Monitor (HWM)
+						io 0x60 = 0x0a20
+						io 0x62 = 0x0a30
+						irq 0x70 = 0
+					end
+					device pnp 2e.d off end   # WDT
+					device pnp 2e.e off end   # CIR Wakeup
+					device pnp 2e.f off end   # GPIO Push-Pull / Open Drain
+					device pnp 2e.14 off end  # Port 80 UART
+					device pnp 2e.16 off end  # Deep Sleep
+					device pnp 2e.308 off end # GPIOBASE
+					device pnp 2e.108 off end # GPIO0
+					device pnp 2e.109 off end # GPIO1
+					device pnp 2e.209 off end # GPIO2
+					device pnp 2e.309 off end # GPIO3
+					device pnp 2e.409 off end # GPIO4
+					device pnp 2e.509 off end # GPIO5
+					device pnp 2e.609 off end # GPIO6
+					device pnp 2e.709 off end # GPIO7
+					device pnp 2e.9 off end   # GPIO8
+				end
+			end
+			device pci 1f.2 on end # SATA AHCI
+			device pci 1f.3 on end # SMBus
+		end
+	end
+end

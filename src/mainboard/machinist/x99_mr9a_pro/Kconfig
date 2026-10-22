@@ -1,0 +1,42 @@
+## SPDX-License-Identifier: GPL-2.0-only
+
+if BOARD_MACHINIST_X99_MR9A_PRO
+
+config BOARD_SPECIFIC_OPTIONS
+	def_bool y
+	select NORTHBRIDGE_INTEL_HASWELL
+	select SOUTHBRIDGE_INTEL_LYNXPOINT
+	select SUPERIO_NUVOTON_NCT6779D
+	select BOARD_ROMSIZE_KB_16384
+	select HAVE_ACPI_RESUME
+	select HAVE_ACPI_TABLES
+	select HAVE_CMOS_DEFAULT
+	select HAVE_OPTION_TABLE
+	select SERIRQ_CONTINUOUS_MODE
+	select AZALIA_USE_LEGACY_VERB_TABLE
+
+config DCACHE_RAM_BASE
+	hex
+	default 0xfe100000
+
+config DCACHE_RAM_SIZE
+	hex
+	default 0x80000
+
+config DCACHE_RAM_MRC_VAR_SIZE
+	hex
+	default 0x0
+
+config MAINBOARD_DIR
+	string
+	default "machinist/x99_mr9a_pro"
+
+config MAINBOARD_PART_NUMBER
+	string
+	default "X99-MR9A PRO"
+
+config CBFS_SIZE
+	hex
+	default 0x800000
+
+endif

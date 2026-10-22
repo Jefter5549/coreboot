@@ -1,0 +1,13 @@
+if VENDOR_MACHINIST
+
+source "src/mainboard/machinist/*/Kconfig.name"
+
+config MAINBOARD_DIR
+	default "machinist/x99_mr9a_pro" if BOARD_MACHINIST_X99_MR9A_PRO
+
+config MAINBOARD_VENDOR
+	default "Machinist"
+
+source "src/mainboard/machinist/*/Kconfig"
+
+endif
