@@ -183,6 +183,18 @@ static uint8_t map_to_pei_oc_pin(const uint8_t oc_pin)
 
 void perform_raminit(const bool s3resume)
 {
+	if (is_haswell_ep()) {
+		printk(BIOS_INFO, "Haswell-EP: DDR4 memory pre-initialized by PEI\n");
+		post_code(0x3b);
+		intel_early_me_status();
+		const bool cbmem_was_initted = !cbmem_recovery(s3resume);
+		if (s3resume && !cbmem_was_initted) {
+			printk(BIOS_CRIT, "Failed to recover CBMEM in S3 resume.\n");
+			system_reset();
+		}
+		return;
+	}
+
 	const struct device *gbe = pcidev_on_root(0x19, 0);
 
 	const struct northbridge_intel_haswell_config *cfg = config_of_soc();

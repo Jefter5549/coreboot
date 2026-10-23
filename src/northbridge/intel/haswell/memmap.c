@@ -17,11 +17,17 @@
 
 static uintptr_t northbridge_get_tseg_base(void)
 {
+	if (is_haswell_ep())
+		return ALIGN_DOWN(pci_read_config32(HASWELL_EP_SAD, SAD_TSEG_BASE), 1 * MiB);
+
 	return ALIGN_DOWN(pci_read_config32(HOST_BRIDGE, TSEG), 1 * MiB);
 }
 
 static uintptr_t northbridge_get_tseg_limit(void)
 {
+	if (is_haswell_ep())
+		return ALIGN_DOWN(pci_read_config32(HASWELL_EP_SAD, SAD_TSEG_LIMIT), 1 * MiB);
+
 	return ALIGN_DOWN(pci_read_config32(HOST_BRIDGE, BGSM), 1 * MiB);
 }
 
@@ -37,6 +43,15 @@ union dpr_register txt_get_chipset_dpr(void)
  */
 static uintptr_t top_of_low_usable_memory(void)
 {
+	if (is_haswell_ep()) {
+		const uintptr_t tolm = pci_read_config32(HASWELL_EP_SAD, SAD_TOLM);
+		const uintptr_t tseg = northbridge_get_tseg_base();
+
+		if (tseg && tseg < tolm)
+			return tseg;
+		return tolm;
+	}
+
 	/*
 	 * Base of DPR is top of usable DRAM below 4 GiB. However, DPR
 	 * isn't always enabled. Unlike most memory map registers, the
