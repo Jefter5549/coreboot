@@ -57,6 +57,7 @@ def main():
 	if len(stock) != 16 * 1024 * 1024 or len(cb) != 16 * 1024 * 1024:
 		sys.exit("Input files must be exactly 16MB (16777216 bytes)")
 
+	car_stack_top = get_symbol_address(args.romstage, "_ecar_stack")
 	car_entry_vma = get_symbol_address(args.romstage, "car_stage_entry")
 	gdtptr_vma = get_symbol_address(args.romstage, "gdtptr")
 	bss_start = get_symbol_address(args.romstage, "_bss")
@@ -79,21 +80,6 @@ def main():
 	image[console_start : console_start + console_size] = b"\xff" * console_size
 
 	fmap_rom_addr = 0xff830000
-	fmap_copy_code = bytearray([
-		0x56, 0x57, 0x51,
-		0xbe,
-	])
-	fmap_copy_code += struct.pack("<I", fmap_rom_addr)
-	fmap_copy_code += bytearray([0xbf])
-	fmap_copy_code += struct.pack("<I", fmap_cache)
-	fmap_copy_code += bytearray([
-		0xb9, 0x80, 0x00, 0x00, 0x00,
-		0xf3, 0xa5,
-		0x59, 0x5f, 0x5e,
-		0xc3,
-	])
-	fmap_code_offset = 0xff1000
-	image[fmap_code_offset : fmap_code_offset + len(fmap_copy_code)] = fmap_copy_code
 
 	trampoline = bytearray([
 		0xb0, 0x77,
@@ -106,7 +92,10 @@ def main():
 		0x8e, 0xd8,
 		0x8e, 0xc0,
 		0x8e, 0xd0,
-		0xbc, 0x00, 0x20, 0x10, 0xfe,
+		0xbc,
+	])
+	trampoline += struct.pack("<I", car_stack_top)
+	trampoline += bytearray([
 		0xfc,
 		0x31, 0xc0,
 		0xb9,
@@ -164,8 +153,14 @@ def main():
 		0x01, 0xc0, 0xd1, 0xfe,
 		0xb0, 0x7a,
 		0xe6, 0x80,
-		0xb8, 0x00, 0x10, 0xff, 0xff,
-		0xff, 0xd0,
+		0xbe,
+	])
+	trampoline += struct.pack("<I", fmap_rom_addr)
+	trampoline += bytearray([0xbf])
+	trampoline += struct.pack("<I", fmap_cache)
+	trampoline += bytearray([
+		0xb9, 0x80, 0x00, 0x00, 0x00,
+		0xf3, 0xa5,
 		0xb0, 0x7b,
 		0xe6, 0x80,
 		0xb8,
@@ -179,7 +174,8 @@ def main():
 		0xeb, 0xfd,
 	])
 
-	hook_offset = 0xffe1d7
+	# DxeIpl entry point (0xffda9b68) executed after PEI memory training completes
+	hook_offset = 0xda9b68
 	image[hook_offset : hook_offset + len(trampoline)] = trampoline
 
 	with open(args.output, "wb") as f_out:

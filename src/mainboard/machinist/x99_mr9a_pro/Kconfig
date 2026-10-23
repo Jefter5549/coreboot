@@ -18,7 +18,7 @@ config BOARD_SPECIFIC_OPTIONS
 
 config DCACHE_RAM_BASE
 	hex
-	default 0xfe100000
+	default 0x01000000
 
 config DCACHE_RAM_SIZE
 	hex
