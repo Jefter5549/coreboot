@@ -19,6 +19,9 @@
 
 /* Device 0:5.0 PCI configuration space (Haswell-EP Uncore SAD / Address Map) */
 #define HASWELL_EP_SAD	PCI_DEV(0, 5, 0)
+#define SAD_TSEG_BASE	0xa8
+#define SAD_TSEG_LIMIT	0xac
+#define SAD_TOLM	0xd0
 
 static inline bool is_haswell_ep(void)
 {
