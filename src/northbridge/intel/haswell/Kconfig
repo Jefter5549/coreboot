@@ -9,6 +9,13 @@ config NORTHBRIDGE_INTEL_HASWELL
 
 if NORTHBRIDGE_INTEL_HASWELL
 
+config SOCKET_INTEL_LGA2011_3
+	bool
+	default n
+	help
+	  Select this for Haswell-EP and Broadwell-EP server/workstation platforms
+	  using LGA2011-3 socket.
+
 config USE_NATIVE_RAMINIT
 	bool "[NOT COMPLETE] Use native raminit"
 	default n

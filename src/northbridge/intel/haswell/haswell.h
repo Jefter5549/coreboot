@@ -16,6 +16,14 @@
 /* Device 0:0.0 PCI configuration space (Host Bridge) */
 #define HOST_BRIDGE	PCI_DEV(0, 0, 0)
 
+/* Device 0:5.0 PCI configuration space (Haswell-EP Uncore SAD / Address Map) */
+#define HASWELL_EP_SAD	PCI_DEV(0, 5, 0)
+
+static inline bool is_haswell_ep(void)
+{
+	return CONFIG(SOCKET_INTEL_LGA2011_3);
+}
+
 /* Device 0:1.x PCI configuration space (PCI Express Graphics) */
 #define PEG_DEV(func)		PCI_DEV(0, 1, func)
 

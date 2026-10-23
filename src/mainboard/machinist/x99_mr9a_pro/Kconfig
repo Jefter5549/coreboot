@@ -23,6 +23,12 @@ config DCACHE_RAM_SIZE
 	hex
 	default 0x80000
 
+config ECAM_MMCONF_BASE_ADDRESS
+	default 0x80000000
+
+config ECAM_MMCONF_BUS_NUMBER
+	default 64
+
 config DCACHE_RAM_MRC_VAR_SIZE
 	hex
 	default 0x0
