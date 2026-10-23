@@ -2,6 +2,7 @@
 
 #include <arch/bootblock.h>
 #include <assert.h>
+#include <device/pci_def.h>
 #include <device/pci_ops.h>
 #include <types.h>
 
@@ -17,8 +18,25 @@ static uint32_t encode_pciexbar_length(void)
 	}
 }
 
+static void haswell_ep_early_init(void)
+{
+	const uint32_t mmcfg_base = CONFIG_ECAM_MMCONF_BASE_ADDRESS;
+	const uint32_t mmcfg_len = CONFIG_ECAM_MMCONF_BUS_NUMBER * 0x100000;
+	const uint32_t mmcfg_limit = mmcfg_base + mmcfg_len;
+
+	pci_io_write_config32(HASWELL_EP_SAD, 0x90, mmcfg_base);
+	pci_io_write_config32(HASWELL_EP_SAD, 0x94, 0);
+	pci_io_write_config32(HASWELL_EP_SAD, 0x98, mmcfg_limit);
+	pci_io_write_config32(HASWELL_EP_SAD, 0x9c, 0);
+}
+
 void bootblock_early_northbridge_init(void)
 {
+	if (is_haswell_ep()) {
+		haswell_ep_early_init();
+		return;
+	}
+
 	/*
 	 * The "io" variant of the config access is explicitly used to setup the
 	 * PCIEXBAR because CONFIG(ECAM_MMCONF_SUPPORT) is set to true. That way, all
@@ -33,3 +51,5 @@ void bootblock_early_northbridge_init(void)
 	pci_io_write_config32(HOST_BRIDGE, PCIEXBAR + 4, 0);
 	pci_io_write_config32(HOST_BRIDGE, PCIEXBAR, reg32);
 }
+
+

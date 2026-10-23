@@ -124,6 +124,11 @@ static void northbridge_setup_iommu(void)
 
 void haswell_early_initialization(void)
 {
+	if (is_haswell_ep()) {
+		/* Haswell-EP server uncore has no IGD/PEG; memory/uncore is initialized separately */
+		return;
+	}
+
 	/* Setup all BARs required for early PCIe and raminit */
 	haswell_setup_bars();
 
@@ -137,3 +142,4 @@ void haswell_early_initialization(void)
 
 	haswell_setup_misc();
 }
+

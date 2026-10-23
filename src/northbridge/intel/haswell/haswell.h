@@ -3,6 +3,7 @@
 #ifndef NORTHBRIDGE_INTEL_HASWELL_HASWELL_H
 #define NORTHBRIDGE_INTEL_HASWELL_HASWELL_H
 
+#include <arch/pci_io_cfg.h>
 #include <device/device.h>
 #include <northbridge/intel/common/fixed_bars.h>
 
@@ -15,6 +16,16 @@
 
 /* Device 0:0.0 PCI configuration space (Host Bridge) */
 #define HOST_BRIDGE	PCI_DEV(0, 0, 0)
+
+/* Device 0:5.0 PCI configuration space (Haswell-EP Uncore SAD / Address Map) */
+#define HASWELL_EP_SAD	PCI_DEV(0, 5, 0)
+
+static inline bool is_haswell_ep(void)
+{
+	const uint16_t id = pci_io_read_config16(HOST_BRIDGE, 0x02);
+
+	return id == 0x2f00 || id == 0x6f00;
+}
 
 /* Device 0:1.x PCI configuration space (PCI Express Graphics) */
 #define PEG_DEV(func)		PCI_DEV(0, 1, func)
