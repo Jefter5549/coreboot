@@ -11,6 +11,16 @@
 .global chipset_teardown_car
 
 chipset_teardown_car:
+#if CONFIG(SOCKET_INTEL_LGA2011_3)
+	post_code(POSTCODE_POSTCAR_TEARDOWN_DONE)
+
+	/* Set up DRAM stack and jump directly to postcar main. */
+	movl	$_estack, %esp
+	andl	$0xfffffff0, %esp
+	call	main
+1:
+	jmp	1b
+#else
 	pop %esp
 
 	post_code(POSTCODE_POSTCAR_DISABLE_CACHE)
@@ -40,3 +50,4 @@ chipset_teardown_car:
 
 	/* Return to caller. */
 	jmp	*%esp
+#endif
