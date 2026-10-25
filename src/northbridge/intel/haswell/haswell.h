@@ -21,6 +21,7 @@
 #define SAD_TSEG_BASE	0xa8
 #define SAD_TSEG_LIMIT	0xac
 #define SAD_TOLM	0xd0
+#define SAD_TOHM	0xd4
 
 static inline bool is_haswell_ep(void)
 {

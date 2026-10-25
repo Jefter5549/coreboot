@@ -292,9 +292,55 @@ static void mc_add_dram_resources(struct device *dev, int *resource_cnt)
 	*resource_cnt = index;
 }
 
+static void haswell_ep_add_dram_resources(struct device *dev, int *resource_cnt)
+{
+	int index = *resource_cnt;
+	const uint32_t tolm = pci_io_read_config32(HASWELL_EP_SAD, SAD_TOLM) & 0xf0000000;
+	const uint32_t tseg_base = ALIGN_DOWN(pci_io_read_config32(HASWELL_EP_SAD,
+								   SAD_TSEG_BASE),
+					      1 * MiB);
+	const uint32_t tseg_limit = ALIGN_DOWN(pci_io_read_config32(HASWELL_EP_SAD,
+								    SAD_TSEG_LIMIT),
+					       1 * MiB);
+	const uint64_t tohm_raw = (uint64_t)pci_io_read_config32(HASWELL_EP_SAD,
+								 SAD_TOHM + 4) << 32 |
+				  pci_io_read_config32(HASWELL_EP_SAD, SAD_TOHM);
+	const uint64_t tohm = tohm_raw & ~((1ULL << 26) - 1);
+
+	printk(BIOS_DEBUG, "Haswell-EP: TOLM: 0x%x, TSEG: 0x%x - 0x%x, TOHM: 0x%llx\n",
+	       tolm, tseg_base, tseg_limit, (unsigned long long)tohm);
+
+	ram_range(dev, index++, 0, 0xa0000);
+	mmio_from_to(dev, index++, 0xa0000, 0xc0000);
+	reserved_ram_from_to(dev, index++, 0xc0000, 1 * MiB);
+
+	if (tseg_base > 1 * MiB)
+		ram_from_to(dev, index++, 1 * MiB, tseg_base);
+
+	if (tseg_limit > tseg_base)
+		reserved_ram_from_to(dev, index++, tseg_base, tseg_limit);
+
+	if (tolm > tseg_limit)
+		reserved_ram_from_to(dev, index++, tseg_limit, tolm);
+
+	if (tohm > 4ULL * GiB)
+		upper_ram_end(dev, index++, tohm);
+
+	*resource_cnt = index;
+}
+
 static void mc_read_resources(struct device *dev)
 {
 	int index = 0;
+
+	if (is_haswell_ep()) {
+		pci_dev_read_resources(dev);
+		mmio_range(dev, index++, CONFIG_ECAM_MMCONF_BASE_ADDRESS,
+			   CONFIG_ECAM_MMCONF_BUS_NUMBER * MiB);
+		haswell_ep_add_dram_resources(dev, &index);
+		return;
+	}
+
 	const bool vtd_capable = !(pci_read_config32(dev, CAPID0_A) & VTD_DISABLE);
 
 	/* Read standard PCI resources */
@@ -444,6 +490,9 @@ static void northbridge_topology_init(void)
 
 static void northbridge_init(struct device *dev)
 {
+	if (is_haswell_ep())
+		return;
+
 	init_egress();
 	northbridge_dmi_init();
 	northbridge_topology_init();
@@ -473,6 +522,9 @@ static void northbridge_init(struct device *dev)
 
 static void northbridge_final(struct device *dev)
 {
+	if (is_haswell_ep())
+		return;
+
 	pci_or_config16(dev, GGC,         1 << 0);
 	pci_or_config32(dev, DPR,         1 << 0);
 	pci_or_config32(dev, MESEG_LIMIT, 1 << 10);

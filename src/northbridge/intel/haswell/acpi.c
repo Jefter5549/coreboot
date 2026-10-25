@@ -71,6 +71,9 @@ unsigned long northbridge_write_acpi_tables(const struct device *const dev,
 					    unsigned long current,
 					    struct acpi_rsdp *const rsdp)
 {
+	if (is_haswell_ep())
+		return current;
+
 	/* Create DMAR table only if we have VT-d capability. */
 	const u32 capid0_a = pci_read_config32(dev, CAPID0_A);
 	if (capid0_a & VTD_DISABLE)
