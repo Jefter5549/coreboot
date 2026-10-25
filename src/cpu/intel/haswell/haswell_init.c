@@ -605,6 +605,9 @@ void mp_init_cpus(struct bus *cpu_bus)
 
 static void haswell_final(struct device *dev)
 {
+	if (is_haswell_ep())
+		return;
+
 	/* Lock memory configuration to protect SMM */
 	msr_set(MSR_LT_LOCK_MEMORY, BIT(0));
 }
